@@ -32,15 +32,8 @@ public:
       if(i != nullptr)
       {
         std::cout << sign << i->label;
-        if (!i->is_end)
-        {
-          std::cout << std::endl;
-          show(i, sign+"-");
-        }
-        else
-        {
-          std::cout << "$" << std::endl;
-        }
+        i->is_end ? std::cout << "$" << std::endl : std::cout << std::endl;
+        show(i, sign+"-");
       }
     }
   }
@@ -50,33 +43,39 @@ public:
     if (node->children[ind] != nullptr)
     {
       std::string end = label;
-      std::string la = node->children[ind]->label;
-      counting(la,end);
-      if (la.size() < node->children[ind]->label.size())
+      std::string n_label = node->children[ind]->label;
+      counting(n_label,end);
+      int e_ind = end[0]-'a';
+      if (n_label.size() < node->children[ind]->label.size())
       {
         std::unique_ptr<Node> no(new Node);
-        no->is_end = false;
-        no->label = node->children[ind]->label.substr(la.size());
+        no->is_end = true;
+        no->label = node->children[ind]->label.substr(n_label.size());
         no->children = std::move(node->children[ind]->children);
-        node->children[ind]->children[no->label[0]-'a'] = std::move(no);
+        node->children[ind]->is_end = false;
+        int l_ind = no->label[0]-'a';
+        node->children[ind]->children[l_ind] = std::move(no);
+        node->children[ind]->label = n_label;
+        if (n_label != end && !end.empty())
+          append(node->children[ind], end);
+        return;
       }
-      node->children[ind]->label = la;
-      if (!node->children[ind]->is_end)
+      node->children[ind]->label = n_label;
+      if (end.empty()) return;
+      if ((node->children[ind]->children[e_ind]) != nullptr)
       {
         append(node->children[ind], end);
       }
       else
       {
-        node->children[ind]->is_end = false;
         std::unique_ptr<Node> no(new Node);
         no->is_end = true;
         no->label = end;
-        node->children[ind]->children[end[0]-'a'] = std::move(no);
+        node->children[ind]->children[e_ind] = std::move(no);
       }
     }
     else
     {
-      node->is_end = false;
       std::unique_ptr<Node> no(new Node);
       no->is_end = true;
       no->label = label;
@@ -90,6 +89,8 @@ public:
   void append(const std::string &label)
   {
     append(root,label);
+//    show();
+//    std::cout << "-----------------" << std::endl;
   }
 };
 
@@ -103,6 +104,8 @@ int main()
   RT.append("alek");
   RT.append("alesha");
   RT.append("maksim");
+  RT.append("sanek");
+  RT.append("sanchez");
   RT.show();
   return 0;
 }
