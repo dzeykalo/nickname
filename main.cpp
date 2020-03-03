@@ -1,6 +1,27 @@
 #include <iostream>
 #include <array>
 #include <memory>
+#include <vector>
+#include <algorithm>
+
+std::vector<std::string> split(const std::string &str, char d)
+{
+  std::vector<std::string> r;
+
+  std::string::size_type start = 0;
+  std::string::size_type stop = str.find_first_of(d);
+  while(stop != std::string::npos)
+  {
+    r.push_back(str.substr(start, stop - start));
+
+    start = stop + 1;
+    stop = str.find_first_of(d, start);
+  }
+
+  r.push_back(str.substr(start));
+
+  return r;
+}
 
 class RadixTrie
 {
@@ -20,11 +41,17 @@ public:
     auto old_size = s1.size();
     if (s1.size() > s2.size())
       s1.swap(s2);
-    int n;
-    for(n = 1; n < s1.size(); n++)
-    {
-      if (s1[n]!=s2[n]) break;
-    }
+//    int n;
+//    for(n = 1; n < s1.size(); n++)
+//    {
+//      if (s1[n]!=s2[n]) break;
+//    }
+//    s1 = s1.substr(0,n);
+//    s2 = s2.substr(n);
+//    return  s1.size() < old_size;
+
+    auto result = std::find_end(s2.begin(), s2.end(), s1.begin(), s1.end());
+    auto n = std::distance(s2.begin(),result);
     s1 = s1.substr(0,n);
     s2 = s2.substr(n);
     return  s1.size() < old_size;
@@ -36,16 +63,9 @@ public:
     {
       if(i != nullptr)
       {
-        if (!i->is_end)
-        {
-          std::cout << nick + i->label;
-          nick_show(i, nick + i->label);
-        }
-        else
-        {
-          std::cout << nick + i->label << std::endl;
-        }
-        std::cout << std::endl;
+        if (i->is_end)
+          std::cout << nick + i->label << "\t" << nick + i->label[0] <<  std::endl;
+        nick_show(i, nick + i->label);
       }
     }
   }
@@ -131,7 +151,15 @@ int main()
   RT.append("maksim");
   RT.append("sanek");
   RT.append("sanchez");
-//  RT.show();
-  RT.nick_show();
+  RT.show();
+//  RT.nick_show();
+
+//  std::vector<std::vector<std::string>> ip_pool;
+//
+//  for(std::string line; std::getline(std::cin, line);)
+//  {
+//    std::vector<std::string> v = split(line, '\t');
+//    ip_pool.push_back(split(v.at(0), '.'));
+//  }
   return 0;
 }
