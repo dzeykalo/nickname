@@ -8,17 +8,15 @@ std::vector<std::string> split(const std::string &str, char d)
 {
   std::vector<std::string> r;
 
-  std::string::size_type start = 0;
-  std::string::size_type stop = str.find_first_of(d);
+  std::string::size_type start = str.find_first_of("\"");
+  std::string::size_type stop = str.find_first_of(d, start);
   while(stop != std::string::npos)
   {
-    r.push_back(str.substr(start, stop - start));
+    r.push_back(str.substr(start + 1, stop - start - 2));
 
-    start = stop + 1;
+    start = str.find_first_of("\"", stop);
     stop = str.find_first_of(d, start);
   }
-
-  r.push_back(str.substr(start));
 
   return r;
 }
@@ -41,19 +39,10 @@ public:
     auto old_size = s1.size();
     if (s1.size() > s2.size())
       s1.swap(s2);
-//    int n;
-//    for(n = 1; n < s1.size(); n++)
-//    {
-//      if (s1[n]!=s2[n]) break;
-//    }
-//    s1 = s1.substr(0,n);
-//    s2 = s2.substr(n);
-//    return  s1.size() < old_size;
 
-    auto result = std::find_end(s2.begin(), s2.end(), s1.begin(), s1.end());
-    auto n = std::distance(s2.begin(),result);
-    s1 = s1.substr(0,n);
-    s2 = s2.substr(n);
+    auto pair = std::mismatch (s1.begin(), s1.end(), s2.begin(), s2.end());
+    s1.erase(pair.first,s1.end());
+    s2.erase(s2.begin(),pair.second);
     return  s1.size() < old_size;
   }
 
@@ -143,23 +132,28 @@ public:
 int main()
 {
   RadixTrie RT;
-  RT.append("aleksey");
-  RT.append("sasha");
-  RT.append("aleks");
-  RT.append("alek");
-  RT.append("alesha");
-  RT.append("maksim");
-  RT.append("sanek");
-  RT.append("sanchez");
-  RT.show();
+//  RT.append("aleksey");
+//  RT.append("sasha");
+//  RT.append("aleks");
+//  RT.append("alek");
+//  RT.append("alesha");
+//  RT.append("maksim");
+//  RT.append("sanek");
+//  RT.append("sanchez");
+//  RT.show();
 //  RT.nick_show();
 
-//  std::vector<std::vector<std::string>> ip_pool;
-//
-//  for(std::string line; std::getline(std::cin, line);)
-//  {
-//    std::vector<std::string> v = split(line, '\t');
-//    ip_pool.push_back(split(v.at(0), '.'));
-//  }
+  std::vector<std::vector<std::string>> v;
+
+  for(std::string line; std::getline(std::cin, line);)
+    v.push_back(split(line, '$'));
+
+  for (auto &i:v){
+    for (auto &s:i)
+      RT.append(s);
+  }
+
+  RT.show();
+  RT.nick_show();
   return 0;
 }
