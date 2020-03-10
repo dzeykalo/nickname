@@ -49,7 +49,7 @@ public:
       {
         if(i != nullptr)
         {
-          std::cout << sign << i->label;
+          std::cout << sign << "\"" << i->label << "\"" ;
           i->is_end ? std::cout << "$" << std::endl : std::cout << std::endl;
           show(i, sign+"-");
         }
